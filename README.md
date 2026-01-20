@@ -64,6 +64,8 @@ elmo-hikes/
 
 - **Andrew Ni** - BCIT CST Student with a passion for outdoor adventures and user-friendly applications. Fun fact: Loves solving Rubik's Cubes in under a minute.
 
+- **Kelly Bayingana** - BCIT CST Student with a passion for outdoor adventures and user-friendly applications. Fun fact: Loves solving Rubik's Cubes in under a minute.
+
 ---
 
 ## Acknowledgments
