@@ -29,7 +29,7 @@ class SiteNavbar extends HTMLElement {
                                 <a class="nav-link" href="/">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/">Search</a>
+                                <a class="nav-link" href="/pages/search.html">Search</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/">Arrivals</a>
