@@ -43,10 +43,6 @@ header {
   font-weight: bold;
 }
 
-nav {
-  justify-self: center;
-}
-
 .nav-links {
   list-style: none;
   display: flex;
