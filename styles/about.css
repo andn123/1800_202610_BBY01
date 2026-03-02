@@ -1,0 +1,85 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+section {
+  padding: 80px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about {
+  background: linear-gradient(135deg, #c9f0ff, #e6faff);
+}
+
+.mission {
+  background-color: #ffffff;
+}
+
+.usage {
+  background: linear-gradient(135deg, #f0faff, #d9f5ff);
+}
+
+.about-content,
+.mission-content,
+.usage-content {
+  max-width: 900px;
+  width: 100%;
+  background: white;
+  padding: 50px;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 25px;
+  color: #0a2a43;
+  font-weight: 700;
+}
+
+section h2 {
+  font-size: 1.4rem;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  color: #6166a3;
+  font-weight: 600;
+}
+
+section p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+video {
+  margin-top: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  section {
+    padding: 60px 15px;
+  }
+
+  .about-content,
+  .mission-content,
+  .usage-content {
+    padding: 30px;
+  }
+
+  section h1 {
+    font-size: 2rem;
+  }
+
+  section h2 {
+    font-size: 1.2rem;
+  }
+}
