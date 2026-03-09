@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Arrivals - IntelliRoute</title>
+    <meta name="comp1800 template" content="My 1800 App" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../styles/style.css" />
+    <script type="module" src="/src/components/site-navbar.js"></script>
+    <script type="module" src="/src/components/site-footer.js"></script>
+    <style>
+      .arrivals-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+      .arrivals-table th {
+        background-color: #343a40;
+        color: white;
+        padding: 10px 14px;
+        text-align: left;
+      }
+      .arrivals-table td {
+        padding: 9px 14px;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .arrivals-table tr:nth-child(even) td {
+        background-color: #f8f9fa;
+      }
+      .stop-heading {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+      }
+      #resultsBox {
+        margin-top: 1.5rem;
+      }
+      .spinner-border {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+      .external-link {
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <site-navbar></site-navbar>
+
+    <main class="container py-5" style="max-width: 700px;">
+      <h1 class="mb-2">Transit Arrivals</h1>
+      <p class="text-muted mb-4">
+        Enter your <strong>Bus Stop ID</strong> — the 5-digit number on the bus stop sign —
+        to see upcoming real-time arrivals.
+      </p>
+
+      <!-- Stop ID search -->
+      <div class="input-group mb-2">
+        <span class="input-group-text">🚏</span>
+        <input
+          type="text"
+          id="stopInput"
+          class="form-control form-control-lg"
+          placeholder="e.g. 51542"
+          maxlength="6"
+          inputmode="numeric"
+          pattern="[0-9]*"
+        />
+        <button class="btn btn-primary btn-lg" id="lookupBtn">Look Up</button>
+      </div>
+      <p class="text-muted" style="font-size: 0.85rem;">
+        Find your stop ID on the physical bus sign or on Google Maps.
+      </p>
+
+      <!-- Validation error -->
+      <div id="errorMsg" class="alert alert-danger d-none mt-3" role="alert">
+        Please enter a valid bus stop number (digits only, 4–6 characters).
+      </div>
+
+      <!-- Results -->
+      <div id="resultsBox" class="d-none">
+        <!-- Stop name + external link -->
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <div id="stopName" class="stop-heading"></div>
+          <a id="externalLink" href="#" target="_blank" rel="noopener noreferrer" class="external-link text-muted">
+            Open on TransitDB ↗
+          </a>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="loadingSpinner" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="text-muted mt-2 mb-0" style="font-size:0.9rem;">Fetching arrivals…</p>
+        </div>
+
+        <!-- Arrivals table -->
+        <div id="tableWrapper" class="d-none table-responsive">
+          <table class="arrivals-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Route & Destination</th>
+              </tr>
+            </thead>
+            <tbody id="arrivalsBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Fetch fallback -->
+        <div id="fallbackMsg" class="alert alert-warning d-none mt-3">
+          Could not load arrivals automatically.
+          <a id="fallbackLink" href="#" target="_blank" rel="noopener noreferrer">
+            Click here to view them on TransitDB ↗
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <site-footer></site-footer>
+
+    <script type="module" src="/src/app.js"></script>
+
+    <script>
+      // Uses a public CORS proxy to fetch the TransitDB mobile page
+      // and parses the arrivals table out of the HTML response.
+      const CORS_PROXY = "https://corsproxy.io/?";
+
+      async function fetchArrivals(stopId) {
+        const targetUrl = `http://m.transitdb.ca/nextbus/${stopId}/`;
+        const proxyUrl = CORS_PROXY + encodeURIComponent(targetUrl);
+
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error("Network response was not ok");
+
+        const html = await response.text();
+
+        // Parse the returned HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        // Extract stop name from <h1> (e.g. "Stop 51542")
+        // and the direction heading from <h4>
+        const h4 = doc.querySelector("h4");
+        const stopLabel = h4 ? h4.textContent.trim() : `Stop ${stopId}`;
+
+        // Extract the first arrivals table (Time | Headsign)
+        const tables = doc.querySelectorAll("table");
+        const rows = [];
+        if (tables.length > 0) {
+          const firstTable = tables[0];
+          firstTable.querySelectorAll("tr").forEach((tr, i) => {
+            if (i === 0) return; // skip header row
+            const cells = tr.querySelectorAll("td");
+            if (cells.length >= 2) {
+              rows.push({
+                time: cells[0].textContent.trim(),
+                headsign: cells[1].textContent.trim(),
+              });
+            }
+          });
+        }
+
+        return { stopLabel, rows };
+      }
+
+      async function handleLookup() {
+        const raw = document.getElementById("stopInput").value.trim();
+        const errorMsg = document.getElementById("errorMsg");
+        const resultsBox = document.getElementById("resultsBox");
+        const loadingSpinner = document.getElementById("loadingSpinner");
+        const tableWrapper = document.getElementById("tableWrapper");
+        const fallbackMsg = document.getElementById("fallbackMsg");
+        const arrivalsBody = document.getElementById("arrivalsBody");
+        const stopName = document.getElementById("stopName");
+        const externalLink = document.getElementById("externalLink");
+        const fallbackLink = document.getElementById("fallbackLink");
+
+        // Validate
+        if (!raw || !/^\d{4,6}$/.test(raw)) {
+          errorMsg.classList.remove("d-none");
+          return;
+        }
+        errorMsg.classList.add("d-none");
+
+        // Set external links
+        const transitDbUrl = `http://m.transitdb.ca/nextbus/${raw}/`;
+        externalLink.href = transitDbUrl;
+        fallbackLink.href = transitDbUrl;
+
+        // Show results box + spinner, hide table and fallback
+        resultsBox.classList.remove("d-none");
+        loadingSpinner.classList.remove("d-none");
+        tableWrapper.classList.add("d-none");
+        fallbackMsg.classList.add("d-none");
+        stopName.textContent = `Stop ${raw}`;
+
+        try {
+          const { stopLabel, rows } = await fetchArrivals(raw);
+
+          stopName.textContent = stopLabel;
+
+          if (rows.length === 0) {
+            fallbackMsg.classList.remove("d-none");
+          } else {
+            arrivalsBody.innerHTML = rows
+              .map(r => `<tr><td><strong>${r.time}</strong></td><td>${r.headsign}</td></tr>`)
+              .join("");
+            tableWrapper.classList.remove("d-none");
+          }
+        } catch (err) {
+          console.error("Failed to fetch arrivals:", err);
+          fallbackMsg.classList.remove("d-none");
+        } finally {
+          loadingSpinner.classList.add("d-none");
+        }
+      }
+
+      document.getElementById("lookupBtn").addEventListener("click", handleLookup);
+
+      document.getElementById("stopInput").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") handleLookup();
+      });
+
+      document.getElementById("stopInput").addEventListener("input", function () {
+        document.getElementById("errorMsg").classList.add("d-none");
+      });
+    </script>
+  </body>
+</html>
