@@ -29,19 +29,57 @@
         <form class="card p-4 shadow">
           <div class="mb-3">
             <label class="form-label">Location Name:</label>
-            <input id="location" type="text" class="form-control" />
+            <input id="location" type="text" class="form-control" required />
           </div>
 
           <div class="mb-3">
             <label class="form-label">Address:</label>
-            <input id="address" type="text" class="form-control" />
+            <input id="address" type="text" class="form-control" required />
           </div>
-
+          <div class="mb-3">
+            <label class="form-label">Upload Image:</label>
+            <input
+              type="file"
+              class="form-control"
+              id="image"
+              accept="image/*"
+              required
+            />
+          </div>
           <div class="mb-3">
             <label class="form-label">Crowd Level:</label>
-            <input id="crowd-level" type="number" class="form-control" />
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="crowd_level"
+                id="quiet"
+                value="quiet"
+                required
+              />
+              <label class="form-check-label" for="quiet">Quiet</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="crowd_level"
+                id="normal"
+                value="normal"
+              />
+              <label class="form-check-label" for="normal">Normal</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="crowd_level"
+                id="busy"
+                value="busy"
+              />
+              <label class="form-check-label" for="busy">Busy</label>
+            </div>
           </div>
-
           <button class="btn btn-primary w-100">Submit</button>
         </form>
       </div>
