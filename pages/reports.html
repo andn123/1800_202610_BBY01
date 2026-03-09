@@ -15,9 +15,34 @@
 
   <body>
     <site-navbar></site-navbar>
+    <div class="container-fluid bg-light text-dark p-5">
+      <h1>Crowd-Level Reports</h1>
+      <div id="crowd-reports" class="row row-cols-1 row-cols-md-3 g-4"></div>
+    </div>
 
+    <template id="crowdCardTemplate">
+      <div class="col">
+        <div class="card h-100">
+          <img
+            class="card-img-top card-image card-img-fixed"
+            src="..."
+            alt="Destination Image"
+          />
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"></h5>
+            <p class="card-text">
+              <span class="report-address"></span><br />
+              <span class="report-crowd"></span><br />
+              <span class="report-created-at"></span><br />
+              <span class="report-created-by"></span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </template>
     <site-footer> </site-footer>
     <script type="module" src="/src/app.js"></script>
+    <script type="module" src="/src/reportsPage.js"></script>
     <!---------------------------------------------->
     <!-- Your own JavaScript functions go here    -->
     <!---------------------------------------------->

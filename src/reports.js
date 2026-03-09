@@ -32,10 +32,12 @@ export async function submitReport(location, address, crowdLevel) {
   }
 
   const imageBase64 = localStorage.getItem("inputImage") || "";
+  const userName = user.displayName || user.email;
 
   try {
     const docRef = await addDoc(collection(db, "reports"), {
       userId: user.uid,
+      name: userName,
       location: location,
       address: address,
       crowdLevel: crowdLevel,
