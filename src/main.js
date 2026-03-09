@@ -10,7 +10,7 @@ function showName() {
   onAuthReady((user) => {
     if (!user) {
       // If no user is signed in → redirect back to login page.
-      location.href = "index.html";
+      location.href = "/pages/login.html";
       return;
     }
 
