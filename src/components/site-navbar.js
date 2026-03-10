@@ -32,7 +32,7 @@ class SiteNavbar extends HTMLElement {
                                 <a class="nav-link" href="/pages/search.html">Search</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/">Arrivals</a>
+                                <a class="nav-link" href="/pages/arrival.html">Arrivals</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/pages/help.html">Help</a>
