@@ -1,23 +1,21 @@
-import "maplibre-gl/dist/maplibre-gl.css"
+import "maplibre-gl/dist/maplibre-gl.css";
 import maplibregl from "maplibre-gl";
 
 const appState = {
-  userLngLat: null
+  userLngLat: null,
 };
 
 function showMap() {
-
   const map = new maplibregl.Map({
     container: "map",
     style: `https://api.maptiler.com/maps/streets/style.json?key=${import.meta.env.VITE_MAPTILER_KEY}`,
     center: [-123.00163752324765, 49.25324576104826],
-    zoom: 10
+    zoom: 10,
   });
 
   map.addControl(new maplibregl.NavigationControl(), "top-right");
 
   map.on("load", async () => {
-
     await addUserPin(map);
 
     console.log("Map loaded");
@@ -25,20 +23,14 @@ function showMap() {
 }
 
 async function addUserPin(map) {
-
   if (!("geolocation" in navigator)) {
     console.warn("Geolocation not available");
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
-
-    pos => {
-
-      appState.userLngLat = [
-        pos.coords.longitude,
-        pos.coords.latitude
-      ];
+    (pos) => {
+      appState.userLngLat = [pos.coords.longitude, pos.coords.latitude];
 
       map.addSource("userLngLat", {
         type: "geojson",
@@ -49,14 +41,14 @@ async function addUserPin(map) {
               type: "Feature",
               geometry: {
                 type: "Point",
-                coordinates: appState.userLngLat
+                coordinates: appState.userLngLat,
               },
               properties: {
-                description: "Your location"
-              }
-            }
-          ]
-        }
+                description: "Your location",
+              },
+            },
+          ],
+        },
       });
 
       map.addLayer({
@@ -67,21 +59,20 @@ async function addUserPin(map) {
           "circle-color": "#1E90FF",
           "circle-radius": 6,
           "circle-stroke-width": 2,
-          "circle-stroke-color": "#ffffff"
-        }
+          "circle-stroke-color": "#ffffff",
+        },
       });
-
     },
 
-    err => {
+    (err) => {
       console.error("Geolocation error", err);
     },
 
     {
       enableHighAccuracy: true,
       timeout: 10000,
-      maximumAge: 0
-    }
+      maximumAge: 0,
+    },
   );
 }
 

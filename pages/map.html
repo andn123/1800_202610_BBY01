@@ -1,41 +1,37 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <title>My BCIT Project - Map</title>
 
-<head>
-  <title>My BCIT Project - Map</title>
+    <meta name="comp1800 template" content="My 1800 App" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="comp1800 template" content="My 1800 App" />
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Global styles -->
+    <link rel="stylesheet" href="/styles/style.css" />
 
-  <!-- Global styles -->
-  <link rel="stylesheet" href="/styles/style.css" />
+    <!-- our own navbar goes here -->
+    <script type="module" src="/src/components/site-navbar.js"></script>
+    <script type="module" src="/src/components/site-footer.js"></script>
+  </head>
 
-  <!-- our own navbar goes here -->
-  <script type="module" src="/src/components/site-navbar.js"></script>
-  <script type="module" src="/src/components/site-footer.js"></script>
-</head>
+  <body>
+    <!-- our own navbar goes here -->
+    <site-navbar></site-navbar>
 
-<body>
+    <!-- Main content goes here -->
+    <main class="container mt-4 mb-4">
+      <h2>Map View</h2>
+      <div id="map" style="width: 100%; height: 400px"></div>
+    </main>
 
-  <!-- our own navbar goes here -->
-  <site-navbar></site-navbar>
+    <!-- our own footer goes here -->
+    <site-footer></site-footer>
 
-  <!-- Main content goes here -->
-  <main class="container mt-4 mb-4">
-    <h2>Map View</h2>
-    <div id="map" style="width: 100%; height: 400px;"></div>
-  </main>
+    <!-- shared app code -->
+    <script type="module" src="/src/app.js"></script>
 
-  <!-- our own footer goes here -->
-  <site-footer></site-footer>
-
-  <!-- shared app code -->
-  <script type="module" src="/src/app.js"></script>
-
-  <!-- map page code -->
-  <script type="module" src="/src/map.js"></script>
-
-</body>
-
+    <!-- map page code -->
+    <script type="module" src="/src/map.js"></script>
+  </body>
 </html>

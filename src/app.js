@@ -1,4 +1,3 @@
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
 
@@ -8,17 +7,61 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 let currentUser = null;
 
-// Track the currently logged-in user
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
   console.log("Current user:", user);
 });
 
+function setupAutocomplete() {
+  const input = document.getElementById("destinationInput");
+  const suggestions = document.getElementById("suggestions");
+
+  if (!input || !suggestions) return;
+
+  let timeout;
+
+  input.addEventListener("input", () => {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(async () => {
+      const query = input.value.trim();
+
+      if (query.length < 3) {
+        suggestions.innerHTML = "";
+        return;
+      }
+
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        suggestions.innerHTML = "";
+
+        data.slice(0, 5).forEach((place) => {
+          const li = document.createElement("li");
+          li.className = "list-group-item list-group-item-action";
+          li.textContent = place.display_name;
+
+          li.addEventListener("click", () => {
+            input.value = place.display_name;
+            suggestions.innerHTML = "";
+          });
+
+          suggestions.appendChild(li);
+        });
+      } catch (err) {
+        console.error("Autocomplete error:", err);
+      }
+    }, 300); // debounce delay
+  });
+}
+
 function setupSearchButton() {
   const searchBtn = document.getElementById("searchRouteBtn");
   const destinationInput = document.getElementById("destinationInput");
 
-  // Only run on pages where these elements exist
   if (!searchBtn || !destinationInput) return;
 
   searchBtn.addEventListener("click", async () => {
@@ -29,35 +72,48 @@ function setupSearchButton() {
       return;
     }
 
-    if (!currentUser) {
-      alert("Please log in first.");
-      return;
-    }
-
-    // Hardcoded route for now, based on your instructor's simplified requirement
     const defaultRoute = `Your location -> Bus 145 -> Bus 344 -> ${destination}`;
 
-    // Use displayName if available, otherwise email
     const userName =
-      currentUser.displayName ||
-      currentUser.email ||
-      "Anonymous User";
+      currentUser?.displayName || currentUser?.email || "Anonymous User";
 
     try {
-      // Save searched route into Firestore
+      // Save to Firestore
       await addDoc(collection(db, "routes"), {
         destination: destination,
         route: defaultRoute,
-        userId: currentUser.uid,
+        userId: currentUser?.uid || null,
         name: userName,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
       console.log("Route saved successfully");
 
-      // After saving, redirect to map page
-      window.location.href = "/pages/map.html";
+      // Get current location
+      let origin = "";
 
+      if ("geolocation" in navigator) {
+        await new Promise((resolve) => {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              origin = `${pos.coords.latitude},${pos.coords.longitude}`;
+              resolve();
+            },
+            () => resolve(),
+          );
+        });
+      }
+
+      const encodedDest = encodeURIComponent(destination);
+
+      let url = `https://www.google.com/maps/dir/?api=1&destination=${encodedDest}`;
+
+      if (origin) {
+        url += `&origin=${origin}`;
+      }
+
+      // Open Google Maps
+      window.open(url, "_blank");
     } catch (error) {
       console.error("Error saving route:", error);
       alert("Failed to save route.");
@@ -67,4 +123,5 @@ function setupSearchButton() {
 
 document.addEventListener("DOMContentLoaded", () => {
   setupSearchButton();
+  setupAutocomplete();
 });
