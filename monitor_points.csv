@@ -1,0 +1,26 @@
+id,monitor_point,category,lat,lng
+MP001,BC Place Gate A,Stadium,49.2776,-123.1128
+MP002,BC Place Expo Blvd Entrance,Stadium,49.2773,-123.1139
+MP003,Terry Fox Plaza,Stadium Plaza,49.2775,-123.1140
+MP004,Robson St & Beatty St,Arrival Corridor,49.2795,-123.1132
+MP005,Georgia St & Beatty St,Arrival Corridor,49.2811,-123.1124
+MP006,Rogers Arena Plaza,Stadium District,49.2777,-123.1089
+MP007,Expo Blvd Pedestrian Zone,Stadium District,49.2774,-123.1115
+MP008,Cambie Bridge North End,Movement Corridor,49.2747,-123.1165
+MP009,Stadium-Chinatown Station Entrance,Transit Hub,49.2796,-123.1090
+MP010,Stadium-Chinatown Station Platform Area,Transit Hub,49.2795,-123.1092
+MP011,Main St–Science World Station Entrance,Transit Hub,49.2734,-123.1009
+MP012,Science World Seawall Route,Movement Corridor,49.2731,-123.1035
+MP013,Waterfront Station Concourse,Transit Hub,49.2857,-123.1117
+MP014,Waterfront Station Dropoff Area,Transit Hub,49.2856,-123.1109
+MP015,Commercial–Broadway Station,Transit Hub,49.2628,-123.0693
+MP016,Burrard Station Entrance,Transit Hub,49.2846,-123.1207
+MP017,Yaletown–Roundhouse Station,Transit Hub,49.2744,-123.1210
+MP018,PNE Main Gate,Fan Festival,49.2827,-123.0415
+MP019,PNE Amphitheatre Viewing Area,Fan Festival,49.2833,-123.0410
+MP020,PNE Beer Garden Area,Fan Festival,49.2831,-123.0405
+MP021,PNE Food Vendor Row,Fan Festival,49.2829,-123.0408
+MP022,Granville St & Robson St,Entertainment District,49.2827,-123.1207
+MP023,Gastown Maple Tree Square,Entertainment District,49.2837,-123.1044
+MP024,Yaletown Hamilton St Bar Row,Entertainment District,49.2744,-123.1210
+MP025,Canada Place Plaza,Waterfront Gathering,49.2887,-123.1112
