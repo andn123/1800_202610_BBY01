@@ -1,28 +1,46 @@
 import { onAuthReady } from "./authentication.js";
 import { submitReport, setupImageUpload } from "./reports.js";
 
-function showName() {
-  const nameElement = document.getElementById("name-goes-here"); // the <h1> element to display "Hello, {name}"
+import { db } from "./firebaseConfig.js";
+import { collection, getDocs } from "firebase/firestore";
 
-  // Wait for Firebase to determine the current authentication state.
-  // onAuthReady() runs the callback once Firebase finishes checking the signed-in user.
-  // The user's name is extracted from the Firebase Authentication object
-  // You can "go to console" to check out current users.
+function showName() {
+  const nameElement = document.getElementById("name-goes-here");
+
   onAuthReady((user) => {
     if (!user) {
-      // If no user is signed in → redirect back to login page.
       location.href = "/pages/login.html";
       return;
     }
 
-    // If a user is logged in:
-    // Use their display name if available, otherwise show their email.
     const name = user.displayName || user.email;
 
-    // Update the welcome message with their name/email.
     if (nameElement) {
       nameElement.textContent = `${name}!`;
     }
+  });
+}
+
+async function loadLocations() {
+  const select = document.getElementById("locationSelect");
+
+  if (!select) return;
+
+  const snapshot = await getDocs(collection(db, "monitor_points"));
+
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+
+    const option = document.createElement("option");
+    option.value = doc.id;
+
+    option.textContent = data.name;
+
+    // store coordinates if available
+    option.dataset.lat = data.lat;
+    option.dataset.lng = data.lng;
+
+    select.appendChild(option);
   });
 }
 
@@ -35,18 +53,40 @@ function setupForm() {
     e.preventDefault();
 
     const submitButton = form.querySelector("button");
-    submitButton.disabled = true; // disable button
+    submitButton.disabled = true;
     submitButton.textContent = "Submitting...";
 
-    const location = document.getElementById("location").value;
-    const address = document.getElementById("address").value;
+    const select = document.getElementById("locationSelect");
+
+    if (!select.value) {
+      alert("Please select a location.");
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit";
+      return;
+    }
+
+    const selectedOption = select.options[select.selectedIndex];
+
+    const location = selectedOption.textContent;
+    const lat = parseFloat(selectedOption.dataset.lat);
+    const lng = parseFloat(selectedOption.dataset.lng);
+    const monitorPointId = select.value;
+
+    const address = location;
 
     const crowdLevel = document.querySelector(
       'input[name="crowd_level"]:checked',
     ).value;
 
     try {
-      await submitReport(location, address, crowdLevel);
+      await submitReport(
+        location,
+        address,
+        crowdLevel,
+        lat,
+        lng,
+        monitorPointId,
+      );
 
       alert("Report submitted!");
       form.reset();
@@ -55,7 +95,7 @@ function setupForm() {
       alert("Error submitting report");
     }
 
-    submitButton.disabled = false; // re-enable button
+    submitButton.disabled = false;
     submitButton.textContent = "Submit";
   });
 }
@@ -63,3 +103,4 @@ function setupForm() {
 showName();
 setupImageUpload();
 setupForm();
+loadLocations();

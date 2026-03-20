@@ -1,5 +1,6 @@
-import { db } from "./firebaseConfig.js";
+import { db, auth } from "./firebaseConfig.js";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { onAuthReady } from "./authentication.js";
 
 async function displayReports() {
   const reportsContainer = document.getElementById("crowd-reports");
@@ -23,10 +24,12 @@ async function displayReports() {
       const cardCreatedAt = clone.querySelector(".report-created-at");
       const cardCreatedBy = clone.querySelector(".report-created-by");
 
-      // Fill template with Firestore data
       cardTitle.textContent = data.location;
-      cardAddress.textContent = `Address: ${data.address}`;
+
+      cardAddress.textContent = `Location ID: ${data.monitorPointId || "N/A"}`;
+
       cardCrowdLevel.textContent = `Crowd level: ${data.crowdLevel}`;
+
       const jsDate = data.createdAt?.toDate();
 
       if (jsDate) {
@@ -46,8 +49,11 @@ async function displayReports() {
 
       cardCreatedBy.textContent = `Submitted by: ${data.name}`;
 
-      // Convert Base64 image back into display format
-      cardImage.src = `data:image/jpeg;base64,${data.image}`;
+      if (data.image) {
+        cardImage.src = `data:image/jpeg;base64,${data.image}`;
+      } else {
+        cardImage.src = "...";
+      }
 
       reportsContainer.appendChild(clone);
     });
@@ -56,4 +62,7 @@ async function displayReports() {
   }
 }
 
-displayReports();
+// Ensure auth is ready
+onAuthReady(() => {
+  displayReports();
+});

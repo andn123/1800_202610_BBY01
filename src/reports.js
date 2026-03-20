@@ -23,7 +23,14 @@ export function setupImageUpload() {
 }
 
 // Save report to Firestore
-export async function submitReport(location, address, crowdLevel) {
+export async function submitReport(
+  location,
+  address,
+  crowdLevel,
+  lat,
+  lng,
+  monitorPointId,
+) {
   const user = auth.currentUser;
 
   if (!user) {
@@ -38,9 +45,15 @@ export async function submitReport(location, address, crowdLevel) {
     const docRef = await addDoc(collection(db, "reports"), {
       userId: user.uid,
       name: userName,
-      location: location,
-      address: address,
-      crowdLevel: crowdLevel,
+
+      monitorPointId,
+      location,
+      address,
+
+      lat,
+      lng,
+
+      crowdLevel,
       image: imageBase64,
       createdAt: serverTimestamp(),
     });
