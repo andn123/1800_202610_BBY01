@@ -1,24 +1,19 @@
-import { db, auth } from "./firebaseConfig.js";
+console.log("REPORTS PAGE LOADED");
+import { db } from "./firebaseConfig.js";
 import { collection, getDocs } from "firebase/firestore";
-import { onAuthReady } from "./authentication.js";
 
 let reports = [];
 
 async function loadReports() {
-  const user = auth.currentUser;
-  if (!user) return;
   try {
     const snapshot = await getDocs(collection(db, "reports"));
-    reports = snapshot.docs
-      .map(doc => doc.data())
-      .filter(data => data.userId === user.uid);
+    reports = snapshot.docs.map((doc) => doc.data());
     updateUI();
   } catch (error) {
     console.error("Error loading reports:", error);
   }
 }
 
-// MAIN FUNCTION (search + sort + display)
 function updateUI() {
   const container = document.getElementById("crowd-reports");
   const template = document.getElementById("crowdCardTemplate");
@@ -28,33 +23,57 @@ function updateUI() {
   let filtered = [...reports];
 
   // SEARCH
-  const search = document.getElementById("searchInput")?.value.toLowerCase() || "";
-  filtered = filtered.filter(r =>
-    (r.address || "").toLowerCase().includes(search) ||
-    (r.location || "").toLowerCase().includes(search)
+  const search =
+    document.getElementById("searchInput")?.value.toLowerCase() || "";
+  filtered = filtered.filter(
+    (r) =>
+      (r.address || "").toLowerCase().includes(search) ||
+      (r.location || "").toLowerCase().includes(search),
   );
 
   // SORT
   const sort = document.getElementById("sortSelect")?.value;
+
   if (sort === "recent") {
     filtered.sort((a, b) => {
       const aTime = a.createdAt?.toDate()?.getTime() || 0;
       const bTime = b.createdAt?.toDate()?.getTime() || 0;
+
+      console.log("Comparing (recent):");
+      console.log("A time:", aTime);
+      console.log("B time:", bTime);
+
       return bTime - aTime;
     });
   } else if (sort === "crowded") {
-    const crowdOrder = { empty: 0, moderate: 1, busy: 2 };
+    const rank = {
+      busy: 3,
+      normal: 2,
+      quiet: 1,
+    };
+
     filtered.sort((a, b) => {
-      const aRank = crowdOrder[a.crowdLevel] ?? -1;
-      const bRank = crowdOrder[b.crowdLevel] ?? -1;
-      return bRank - aRank;
+      console.log("Comparing (crowded):");
+      console.log("A:", a);
+      console.log("B:", b);
+
+      const aLevel = (a.crowdLevel || "").toLowerCase();
+      const bLevel = (b.crowdLevel || "").toLowerCase();
+
+      console.log("A level:", aLevel);
+      console.log("B level:", bLevel);
+
+      const result = (rank[bLevel] || 0) - (rank[aLevel] || 0);
+      console.log("Result:", result);
+
+      return result;
     });
   }
 
   // CLEAR
   container.innerHTML = "";
 
-  // NO RESULTS MESSAGE
+  // NO RESULTS
   if (filtered.length === 0) {
     if (noResults) noResults.style.display = "block";
     return;
@@ -65,6 +84,7 @@ function updateUI() {
   // DISPLAY
   filtered.forEach((data) => {
     const clone = template.content.cloneNode(true);
+
     const cardTitle = clone.querySelector(".card-title");
     const cardImage = clone.querySelector(".card-img-top");
     const cardAddress = clone.querySelector(".report-address");
@@ -77,14 +97,13 @@ function updateUI() {
     cardCrowdLevel.textContent = `Crowd level: ${data.crowdLevel || "N/A"}`;
 
     const jsDate = data.createdAt?.toDate();
-    if (jsDate) {
-      cardCreatedAt.textContent = `Created on: ${jsDate.toLocaleString()}`;
-    } else {
-      cardCreatedAt.textContent = "Created on: unknown";
-    }
+    cardCreatedAt.textContent = jsDate
+      ? `Created on: ${jsDate.toLocaleString()}`
+      : "Created on: unknown";
 
     cardCreatedBy.textContent = `Submitted by: ${data.name || "Anonymous"}`;
     cardImage.src = `data:image/jpeg;base64,${data.image}`;
+
     container.appendChild(clone);
   });
 }
@@ -96,7 +115,7 @@ function setupListeners() {
 }
 
 // INIT
-onAuthReady(() => {
+document.addEventListener("DOMContentLoaded", () => {
   setupListeners();
   loadReports();
 });
