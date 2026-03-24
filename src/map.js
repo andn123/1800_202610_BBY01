@@ -1,9 +1,14 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import maplibregl from "maplibre-gl";
 
+import { db } from "./firebaseConfig.js";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+
 const appState = {
   userLngLat: null,
 };
+
+let currentPopup = null;
 
 function showMap() {
   const map = new maplibregl.Map({
@@ -17,8 +22,7 @@ function showMap() {
 
   map.on("load", async () => {
     await addUserPin(map);
-
-    console.log("Map loaded");
+    await addReportMarkers(map);
   });
 }
 
@@ -63,17 +67,92 @@ async function addUserPin(map) {
         },
       });
     },
-
     (err) => {
       console.error("Geolocation error", err);
     },
-
     {
       enableHighAccuracy: true,
       timeout: 10000,
       maximumAge: 0,
-    },
+    }
   );
+}
+
+function getMarkerColor(level) {
+  const value = (level || "").toLowerCase();
+
+  if (value === "quiet") return "green";
+  if (value === "normal") return "orange";
+  if (value === "busy") return "red";
+
+  return "gray";
+}
+
+function buildPopupHtml(data) {
+  const imageHtml = data.image
+    ? `<img src="data:image/jpeg;base64,${data.image}" alt="Report image" style="width:100%;max-width:180px;border-radius:8px;margin-top:8px;" />`
+    : "";
+
+  return `
+    <div style="min-width:180px;">
+      <strong>${data.name || "Anonymous"}</strong><br>
+      Crowd level: ${data.crowdLevel || "N/A"}<br>
+      ${data.location || ""}
+      ${imageHtml}
+    </div>
+  `;
+}
+
+async function addReportMarkers(map) {
+  try {
+    const q = query(collection(db, "reports"), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+
+      if (typeof data.lat !== "number" || typeof data.lng !== "number") {
+        return;
+      }
+
+      const coords = [data.lng, data.lat];
+
+      const markerEl = document.createElement("div");
+      markerEl.style.width = "18px";
+      markerEl.style.height = "18px";
+      markerEl.style.borderRadius = "50%";
+      markerEl.style.backgroundColor = getMarkerColor(data.crowdLevel);
+      markerEl.style.border = "2px solid white";
+      markerEl.style.cursor = "pointer";
+
+      const popup = new maplibregl.Popup({
+        closeButton: true,
+        closeOnClick: false,
+        offset: 18,
+      }).setHTML(buildPopupHtml(data));
+
+      const marker = new maplibregl.Marker(markerEl)
+        .setLngLat(coords)
+        .setPopup(popup)
+        .addTo(map);
+
+      markerEl.addEventListener("click", () => {
+        if (currentPopup && currentPopup !== popup) {
+          currentPopup.remove();
+        }
+
+        if (popup.isOpen()) {
+          popup.remove();
+          currentPopup = null;
+        } else {
+          marker.togglePopup();
+          currentPopup = popup;
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error loading report markers:", error);
+  }
 }
 
 showMap();
