@@ -13,7 +13,7 @@ async function loadReports() {
 
     reports = snapshot.docs
       .map(doc => doc.data())
-      .filter(data => data.userId === user.uid); // only your reports
+      .filter(data => data.userId === user.uid);
 
     updateUI();
   } catch (error) {
@@ -21,35 +21,50 @@ async function loadReports() {
   }
 }
 
-// 🔥 MAIN FUNCTION (search + sort)
+// MAIN FUNCTION (search + sort + display)
 function updateUI() {
   const container = document.getElementById("crowd-reports");
   const template = document.getElementById("crowdCardTemplate");
+  const noResults = document.getElementById("noResultsMessage");
 
   if (!container || !template) return;
 
   let filtered = [...reports];
 
-  // SEARCH
+  // SEARCH (safe)
   const search = document.getElementById("searchInput")?.value.toLowerCase() || "";
   filtered = filtered.filter(r =>
-    r.address?.toLowerCase().includes(search) ||
-    r.location?.toLowerCase().includes(search)
+    (r.address || "").toLowerCase().includes(search) ||
+    (r.location || "").toLowerCase().includes(search)
   );
 
-  // SORT
+  // SORT (fixed)
   const sort = document.getElementById("sortSelect")?.value;
 
   if (sort === "recent") {
-    filtered.sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds);
+    filtered.sort((a, b) => {
+      const aTime = a.createdAt?.toDate()?.getTime() || 0;
+      const bTime = b.createdAt?.toDate()?.getTime() || 0;
+      return bTime - aTime;
+    });
   } else if (sort === "crowded") {
-    filtered.sort((a, b) => b.crowdLevel - a.crowdLevel);
+    filtered.sort((a, b) => {
+      return parseInt(b.crowdLevel || 0) - parseInt(a.crowdLevel || 0);
+    });
   }
 
-  // CLEAR before re-render
+  // CLEAR
   container.innerHTML = "";
 
-  // DISPLAY
+  // NO RESULTS MESSAGE
+  if (filtered.length === 0) {
+    if (noResults) noResults.style.display = "block";
+    return;
+  } else {
+    if (noResults) noResults.style.display = "none";
+  }
+
+  //  DISPLAY
   filtered.forEach((data) => {
     const clone = template.content.cloneNode(true);
 
@@ -60,9 +75,9 @@ function updateUI() {
     const cardCreatedAt = clone.querySelector(".report-created-at");
     const cardCreatedBy = clone.querySelector(".report-created-by");
 
-    cardTitle.textContent = data.location;
-    cardAddress.textContent = `Address: ${data.address}`;
-    cardCrowdLevel.textContent = `Crowd level: ${data.crowdLevel}`;
+    cardTitle.textContent = data.location || "No location";
+    cardAddress.textContent = `Address: ${data.address || "N/A"}`;
+    cardCrowdLevel.textContent = `Crowd level: ${data.crowdLevel || "N/A"}`;
 
     const jsDate = data.createdAt?.toDate();
     if (jsDate) {
@@ -78,13 +93,13 @@ function updateUI() {
   });
 }
 
-// 🎯 EVENT LISTENERS
+//  EVENT LISTENERS
 function setupListeners() {
   document.getElementById("searchInput")?.addEventListener("input", updateUI);
   document.getElementById("sortSelect")?.addEventListener("change", updateUI);
 }
 
-// WAIT FOR AUTH
+//  INIT
 onAuthReady(() => {
   setupListeners();
   loadReports();
