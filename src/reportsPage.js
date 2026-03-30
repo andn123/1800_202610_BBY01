@@ -90,7 +90,7 @@ function filterAndSortReports() {
   const sortOption = document.getElementById("sortSelect").value;
 
   let filtered = allReports.filter((report) =>
-    report.location.toLowerCase().includes(searchTerm)
+    report.location.toLowerCase().includes(searchTerm),
   );
 
   if (sortOption === "crowded") {

@@ -1,0 +1,124 @@
+#map {
+  width: 100%;
+  height: 500px;
+}
+
+#mode-toggle {
+  margin-bottom: 0.75rem;
+}
+
+#mode-toggle button {
+  margin-right: 0.25rem;
+}
+
+#directions {
+  margin-top: 1rem;
+}
+
+#directions h5 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+#directions ol {
+  padding-left: 1.2rem;
+  line-height: 1.8;
+}
+
+#directions .transit-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f0f4ff;
+  border-radius: 8px;
+  border: 1px solid #c7d4f0;
+}
+#search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.maplibregl-ctrl-geocoder {
+  width: 700px !important;
+  max-width: 100% !important;
+}
+
+.maplibregl-ctrl-geocoder input {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.maplibregl-ctrl-geocoder .suggestions {
+  max-width: 700px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.maplibregl-ctrl-top-left {
+  left: 50% !important;
+  transform: translateX(-50%);
+}
+
+.maplibregl-ctrl-geocoder input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+.maplibregl-ctrl-geocoder input[type="search"]::-webkit-search-decoration {
+  display: none;
+}
+
+.directions-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #007cbf;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px 8px 0 0;
+}
+
+.directions-steps {
+  border: 1px solid #d0e8f5;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.direction-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.direction-step:last-child {
+  border-bottom: none;
+}
+
+.direction-step:nth-child(even) {
+  background: #f8fbfd;
+}
+
+.step-icon {
+  width: 1.25rem;
+  text-align: center;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.step-text {
+  flex: 1;
+}
+
+.step-dist {
+  color: #888;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
+}

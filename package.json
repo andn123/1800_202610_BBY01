@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
+    "@maplibre/maplibre-gl-geocoder": "^1.9.4",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
     "firebase": "^12.10.0",
