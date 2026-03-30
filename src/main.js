@@ -21,26 +21,59 @@ function showName() {
   });
 }
 
+let locations = [];
+
 async function loadLocations() {
-  const select = document.getElementById("locationSelect");
-
-  if (!select) return;
-
   const snapshot = await getDocs(collection(db, "monitor_points"));
 
-  snapshot.forEach((doc) => {
-    const data = doc.data();
+  locations = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    name: doc.data().name,
+    lat: doc.data().lat,
+    lng: doc.data().lng,
+  }));
+}
 
-    const option = document.createElement("option");
-    option.value = doc.id;
+let selectedLocation = null;
 
-    option.textContent = data.name;
+function setupLocationSearch() {
+  const input = document.getElementById("locationSearch");
+  const dropdown = document.getElementById("locationDropdown");
 
-    // store coordinates if available
-    option.dataset.lat = data.lat;
-    option.dataset.lng = data.lng;
+  if (!input || !dropdown) return;
 
-    select.appendChild(option);
+  input.addEventListener("input", () => {
+    const query = input.value.toLowerCase();
+    dropdown.innerHTML = "";
+    selectedLocation = null;
+
+    if (!query) return;
+
+    const filtered = locations.filter((loc) =>
+      loc.name.toLowerCase().includes(query),
+    );
+
+    filtered.forEach((loc) => {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "list-group-item list-group-item-action";
+      item.textContent = loc.name;
+
+      item.addEventListener("click", () => {
+        input.value = loc.name;
+        selectedLocation = loc;
+        dropdown.innerHTML = "";
+      });
+
+      dropdown.appendChild(item);
+    });
+  });
+
+  // close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.innerHTML = "";
+    }
   });
 }
 
@@ -56,21 +89,18 @@ function setupForm() {
     submitButton.disabled = true;
     submitButton.textContent = "Submitting...";
 
-    const select = document.getElementById("locationSelect");
-
-    if (!select.value) {
-      alert("Please select a location.");
+    // Use the selectedLocation from the search dropdown
+    if (!selectedLocation) {
+      alert("Please select a valid location from the list.");
       submitButton.disabled = false;
       submitButton.textContent = "Submit";
       return;
     }
 
-    const selectedOption = select.options[select.selectedIndex];
-
-    const location = selectedOption.textContent;
-    const lat = parseFloat(selectedOption.dataset.lat);
-    const lng = parseFloat(selectedOption.dataset.lng);
-    const monitorPointId = select.value;
+    const location = selectedLocation.name;
+    const lat = selectedLocation.lat;
+    const lng = selectedLocation.lng;
+    const monitorPointId = selectedLocation.id;
 
     const address = location;
 
@@ -90,6 +120,7 @@ function setupForm() {
 
       alert("Report submitted!");
       form.reset();
+      selectedLocation = null; // reset selection after submit
     } catch (error) {
       console.error(error);
       alert("Error submitting report");
@@ -100,7 +131,11 @@ function setupForm() {
   });
 }
 
-showName();
-setupImageUpload();
-setupForm();
-loadLocations();
+document.addEventListener("DOMContentLoaded", async () => {
+  showName();
+  setupImageUpload();
+  setupForm();
+
+  await loadLocations(); // load data first
+  setupLocationSearch(); // then enable search UI
+});
