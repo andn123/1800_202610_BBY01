@@ -6,6 +6,7 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
 // Global map instance
 let map = null;
+let reportPoints = [];
 
 const appState = {
   userLngLat: null,
@@ -181,6 +182,7 @@ async function routeToPoint(destLng, destLat) {
   }
 
   const [userLng, userLat] = appState.userLngLat;
+  const crowded = isDestinationCrowded(destLng, destLat);
   const profile = appState.travelMode;
 
   // Transit - direct to Google Maps
@@ -288,7 +290,17 @@ async function routeToPoint(destLng, destLat) {
     }
 
     document.getElementById("directions").innerHTML = `
+      ${
+        crowded
+          ? `
+        <div class="alert alert-danger mb-2">
+          ⚠️ This destination has recent reports of being <strong>busy</strong>.
+        </div>
+      `
+          : ""
+      }
       <div class="directions-header">
+
         <span class="summary-icon">${modeIcon}</span>
         <div class="summary-text">
           <strong>${totalDistance} km · ${totalDuration} min</strong>
@@ -336,6 +348,13 @@ async function addReportMarkers() {
       const data = doc.data();
       if (typeof data.lat !== "number" || typeof data.lng !== "number") return;
 
+      // Save for later crowd detection
+      reportPoints.push({
+        lat: data.lat,
+        lng: data.lng,
+        crowdLevel: data.crowdLevel,
+      });
+
       const popup = new maplibregl.Popup({
         closeButton: true,
         closeOnClick: true,
@@ -350,6 +369,24 @@ async function addReportMarkers() {
   } catch (error) {
     console.error("Error loading report markers:", error);
   }
+}
+
+function isDestinationCrowded(destLng, destLat) {
+  const thresholdMeters = 180;
+
+  for (const r of reportPoints) {
+    if (!r.crowdLevel || r.crowdLevel.toLowerCase() !== "busy") continue;
+
+    const dx = (r.lng - destLng) * 111320 * Math.cos((destLat * Math.PI) / 180);
+    const dy = (r.lat - destLat) * 110540;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < thresholdMeters) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 showMap();
