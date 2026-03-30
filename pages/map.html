@@ -2,17 +2,15 @@
 <html lang="en">
   <head>
     <title>My BCIT Project - Map</title>
-    <meta name="comp1800 template" content="My 1800 App" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <meta name="comp1800 template" content="My 1800 App" />
     <link rel="stylesheet" href="/styles/style.css" />
     <link rel="stylesheet" href="/styles/map.css" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"
     />
-
     <script type="module" src="/src/components/site-navbar.js"></script>
     <script type="module" src="/src/components/site-footer.js"></script>
   </head>
@@ -20,39 +18,60 @@
   <body>
     <site-navbar></site-navbar>
 
-    <main class="container mt-4 mb-4">
-      <h2>Map View</h2>
+    <div class="container-fluid bg-light text-dark py-5">
+      <div class="container bg-light p-5 shadow-sm rounded">
+        <h1 class="display-4 text-center mb-4">Search</h1>
+        <hr />
 
-      <!-- Travel mode toggle -->
-      <div id="mode-toggle">
-        <button
-          class="btn btn-sm btn-primary"
-          onclick="setMode('foot-walking')"
-        >
-          🚶 Walk
-        </button>
-        <button
-          class="btn btn-sm btn-outline-secondary"
-          onclick="setMode('driving-car')"
-        >
-          🚗 Drive
-        </button>
-        <button
-          class="btn btn-sm btn-outline-secondary"
-          onclick="setMode('transit')"
-        >
-          🚌 Transit
-        </button>
+        <!-- Search with map section -->
+        <div class="form-group mt-4">
+          <!-- Travel mode toggle -->
+          <div
+            id="mode-toggle"
+            class="d-flex justify-content-center gap-2 mb-3"
+          >
+            <button
+              class="btn btn-sm btn-primary"
+              onclick="setMode('foot-walking')"
+            >
+              🚶 Walk
+            </button>
+            <button
+              class="btn btn-sm btn-outline-secondary"
+              onclick="setMode('driving-car')"
+            >
+              🚗 Drive
+            </button>
+            <button
+              class="btn btn-sm btn-outline-secondary"
+              onclick="setMode('transit')"
+            >
+              🚌 Transit
+            </button>
+          </div>
+          <div id="search-container"></div>
+
+          <!-- Map -->
+          <div id="map" class="mb-3"></div>
+
+          <!-- Directions panel -->
+          <div id="directions"></div>
+
+          <!-- Autocomplete suggestions -->
+          <ul id="suggestions" class="list-group mt-3"></ul>
+        </div>
+
+        <!-- Buttons section -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+          <a href="./post.html" class="btn btn-primary">Post Crowd-Level</a>
+          <a href="./reports.html" class="btn btn-primary">View Crowd-Levels</a>
+        </div>
       </div>
-
-      <div id="map"></div>
-
-      <!-- Directions panel -->
-      <div id="directions"></div>
-    </main>
+    </div>
 
     <site-footer></site-footer>
 
+    <!-- Scripts -->
     <script type="module" src="/src/app.js"></script>
     <script type="module" src="/src/map.js"></script>
   </body>

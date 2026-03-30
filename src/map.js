@@ -141,7 +141,7 @@ function addSearchControl() {
     debounceSearch: 300,
   });
 
-  map.addControl(geocoder, "top-left");
+  document.getElementById("search-container").appendChild(geocoder.onAdd(map));
 
   geocoder.on("result", (e) => {
     const [lng, lat] = e.result.center;

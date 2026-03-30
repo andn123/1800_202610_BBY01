@@ -34,10 +34,15 @@
   border-radius: 8px;
   border: 1px solid #c7d4f0;
 }
+#search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
 
 .maplibregl-ctrl-geocoder {
+  width: 700px !important;
   max-width: 100% !important;
-  width: 300px !important;
 }
 
 .maplibregl-ctrl-geocoder input {
@@ -47,9 +52,14 @@
 }
 
 .maplibregl-ctrl-geocoder .suggestions {
-  max-width: 300px;
+  max-width: 700px;
   white-space: normal;
   word-break: break-word;
+}
+
+.maplibregl-ctrl-top-left {
+  left: 50% !important;
+  transform: translateX(-50%);
 }
 
 .maplibregl-ctrl-geocoder input[type="search"]::-webkit-search-cancel-button {
