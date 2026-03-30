@@ -27,31 +27,42 @@
       <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
 
       <!-- SEARCH + SORT -->
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Search location..."
-        class="form-control mb-2"
-      />
-
-      <select id="sortSelect" class="form-select mb-3">
-        <option value="recent">Most Recent</option>
-        <option value="crowded">Most Crowded</option>
-      </select>
+      <div class="row g-2 mb-3 mt-3">
+        <div class="col-12 col-md-8">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by destination name or address..."
+            class="form-control"
+          />
+        </div>
+        <div class="col-12 col-md-4">
+          <select id="sortSelect" class="form-select">
+            <option value="recent">Most Recent</option>
+            <option value="crowded">Most Crowded</option>
+          </select>
+        </div>
+      </div>
 
       <!-- No results message -->
       <div id="noResultsMessage" class="alert alert-warning" style="display: none;">
         No reports found.
       </div>
 
-      <!-- existing container -->
+      <!-- Page info (e.g. "Showing 1–12 of 34 reports") -->
+      <p id="pageInfo" class="text-muted small mb-2"></p>
+
+      <!-- Reports grid -->
       <div
         id="crowd-reports"
         class="row row-cols-1 row-cols-md-3 g-4"
       ></div>
+
+      <!-- Pagination -->
+      <div id="paginationContainer" class="mt-4"></div>
     </div>
 
-    <!-- template -->
+    <!-- Card template -->
     <template id="crowdCardTemplate">
       <div class="col">
         <div class="card h-100">
