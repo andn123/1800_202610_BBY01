@@ -7,17 +7,22 @@ import { collection, getDocs, query, orderBy } from "firebase/firestore";
 // Global map instance
 let map = null;
 let reportPoints = [];
+let reportMarkers = [];
+let currentPopup = null;
 
 const appState = {
   userLngLat: null,
   travelMode: "foot-walking",
-  pendingDestination: null, // stores destination if searched before location ready
+  pendingDestination: null,
+  markersVisible: true,
 };
 
 // Map init
 function showMap() {
   const mapContainer = document.getElementById("map");
   if (!mapContainer) return;
+
+  injectMapExtras();
 
   map = new maplibregl.Map({
     container: "map",
@@ -33,6 +38,98 @@ function showMap() {
     await addReportMarkers();
     addSearchControl();
   });
+
+  map.on("click", () => {
+    closeCurrentPopup();
+  });
+}
+
+// Add legend + toggle around map
+function injectMapExtras() {
+  if (document.getElementById("map-extras")) return;
+
+  const mapContainer = document.getElementById("map");
+  if (!mapContainer) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.id = "map-extras";
+  wrapper.style.display = "flex";
+  wrapper.style.flexWrap = "wrap";
+  wrapper.style.alignItems = "center";
+  wrapper.style.gap = "12px";
+  wrapper.style.marginBottom = "12px";
+
+  const toggleBtn = document.createElement("button");
+  toggleBtn.id = "toggle-markers-btn";
+  toggleBtn.textContent = "Hide Markers";
+  toggleBtn.className = "btn btn-outline-primary btn-sm";
+
+  toggleBtn.addEventListener("click", () => {
+    appState.markersVisible = !appState.markersVisible;
+
+    reportMarkers.forEach((marker) => {
+      if (appState.markersVisible) {
+        marker.addTo(map);
+      } else {
+        marker.remove();
+      }
+    });
+
+    if (!appState.markersVisible) {
+      closeCurrentPopup();
+    }
+
+    toggleBtn.textContent = appState.markersVisible
+      ? "Hide Markers"
+      : "Show Markers";
+  });
+
+  const legend = document.createElement("div");
+  legend.style.display = "flex";
+  legend.style.flexWrap = "wrap";
+  legend.style.alignItems = "center";
+  legend.style.gap = "10px";
+  legend.style.padding = "8px 12px";
+  legend.style.border = "1px solid #ddd";
+  legend.style.borderRadius = "10px";
+  legend.style.backgroundColor = "#f8f9fa";
+  legend.style.fontSize = "14px";
+
+  const legendTitle = document.createElement("strong");
+  legendTitle.textContent = "Legend:";
+  legend.appendChild(legendTitle);
+
+  legend.appendChild(makeLegendItem("green", "Quiet"));
+  legend.appendChild(makeLegendItem("orange", "Normal"));
+  legend.appendChild(makeLegendItem("red", "Busy"));
+  legend.appendChild(makeLegendItem("gray", "Unknown"));
+
+  wrapper.appendChild(toggleBtn);
+  wrapper.appendChild(legend);
+
+  mapContainer.parentNode.insertBefore(wrapper, mapContainer);
+}
+
+function makeLegendItem(color, text) {
+  const item = document.createElement("div");
+  item.style.display = "flex";
+  item.style.alignItems = "center";
+  item.style.gap = "6px";
+
+  const dot = document.createElement("span");
+  dot.style.width = "14px";
+  dot.style.height = "14px";
+  dot.style.borderRadius = "50%";
+  dot.style.backgroundColor = color;
+  dot.style.display = "inline-block";
+  dot.style.border = "1px solid #999";
+
+  const label = document.createElement("span");
+  label.textContent = text;
+
+  item.appendChild(dot);
+  item.appendChild(label);
+  return item;
 }
 
 // User location pin
@@ -43,7 +140,6 @@ function addUserPin() {
     (pos) => {
       appState.userLngLat = [pos.coords.longitude, pos.coords.latitude];
 
-      // If user already searched a destination, route to it now
       if (appState.pendingDestination) {
         const [lng, lat] = appState.pendingDestination;
         routeToPoint(lng, lat);
@@ -93,10 +189,12 @@ window.setMode = function (mode) {
     btn.classList.remove("btn-primary");
     btn.classList.add("btn-outline-secondary");
   });
-  event.target.classList.remove("btn-outline-secondary");
-  event.target.classList.add("btn-primary");
 
-  // Re-route with new mode if destination already selected
+  if (typeof event !== "undefined" && event.target) {
+    event.target.classList.remove("btn-outline-secondary");
+    event.target.classList.add("btn-primary");
+  }
+
   if (appState.pendingDestination) {
     const [lng, lat] = appState.pendingDestination;
     routeToPoint(lng, lat);
@@ -105,6 +203,9 @@ window.setMode = function (mode) {
 
 // Search control (Nominatim geocoder)
 function addSearchControl() {
+  const searchContainer = document.getElementById("search-container");
+  if (!searchContainer) return;
+
   const geocoderApi = {
     forwardGeocode: async (config) => {
       const features = [];
@@ -141,7 +242,8 @@ function addSearchControl() {
     debounceSearch: 300,
   });
 
-  document.getElementById("search-container").appendChild(geocoder.onAdd(map));
+  searchContainer.innerHTML = "";
+  searchContainer.appendChild(geocoder.onAdd(map));
 
   geocoder.on("result", (e) => {
     const [lng, lat] = e.result.center;
@@ -171,7 +273,6 @@ function stepIcon(type) {
 
 // Routing
 async function routeToPoint(destLng, destLat) {
-  // Always save destination in case location isn't ready yet
   appState.pendingDestination = [destLng, destLat];
 
   if (!appState.userLngLat) {
@@ -185,7 +286,6 @@ async function routeToPoint(destLng, destLat) {
   const crowded = isDestinationCrowded(destLng, destLat);
   const profile = appState.travelMode;
 
-  // Transit - direct to Google Maps
   if (profile === "transit") {
     const origin = `${userLat},${userLng}`;
     const destination = `${destLat},${destLng}`;
@@ -202,18 +302,20 @@ async function routeToPoint(destLng, destLat) {
       });
     }
 
-    document.getElementById("directions").innerHTML = `
-      <div class="transit-box">
-        <span>🚌 Transit directions open in Google Maps.</span>
-        <a href="${gmUrl}" target="_blank" class="btn btn-sm btn-primary">Open in Google Maps</a>
-      </div>
-    `;
+    const directions = document.getElementById("directions");
+    if (directions) {
+      directions.innerHTML = `
+        <div class="transit-box">
+          <span>🚌 Transit directions open in Google Maps.</span>
+          <a href="${gmUrl}" target="_blank" class="btn btn-sm btn-primary">Open in Google Maps</a>
+        </div>
+      `;
+    }
 
     window.open(gmUrl, "_blank");
     return;
   }
 
-  // Walk / Drive - ORS routing
   const url = `https://api.openrouteservice.org/v2/directions/${profile}/geojson`;
 
   try {
@@ -241,16 +343,20 @@ async function routeToPoint(destLng, destLat) {
 
     const feature = data.features[0];
 
-    // Draw or update the route line
     if (map.getSource("route")) {
-      map
-        .getSource("route")
-        .setData({ type: "Feature", geometry: feature.geometry });
+      map.getSource("route").setData({
+        type: "Feature",
+        geometry: feature.geometry,
+      });
     } else {
       map.addSource("route", {
         type: "geojson",
-        data: { type: "Feature", geometry: feature.geometry },
+        data: {
+          type: "Feature",
+          geometry: feature.geometry,
+        },
       });
+
       map.addLayer({
         id: "route",
         type: "line",
@@ -262,7 +368,6 @@ async function routeToPoint(destLng, destLat) {
       });
     }
 
-    // Build styled directions panel
     const segments = feature.properties.segments;
     const totalDistance = (feature.properties.summary.distance / 1000).toFixed(
       2,
@@ -279,6 +384,7 @@ async function routeToPoint(destLng, destLat) {
             ? `${Math.round(step.distance)} m`
             : `${(step.distance / 1000).toFixed(1)} km`;
         const icon = stepIcon(step.type);
+
         stepsHtml += `
           <div class="direction-step">
             <span class="step-icon">${icon}</span>
@@ -289,26 +395,28 @@ async function routeToPoint(destLng, destLat) {
       }
     }
 
-    document.getElementById("directions").innerHTML = `
-      ${
-        crowded
-          ? `
-        <div class="alert alert-danger mb-2">
-          ⚠️ This destination has recent reports of being <strong>busy</strong>.
+    const directions = document.getElementById("directions");
+    if (directions) {
+      directions.innerHTML = `
+        ${
+          crowded
+            ? `
+          <div class="alert alert-danger mb-2">
+            ⚠️ This destination has recent reports of being <strong>busy</strong>.
+          </div>
+        `
+            : ""
+        }
+        <div class="directions-header">
+          <span class="summary-icon">${modeIcon}</span>
+          <div class="summary-text">
+            <strong>${totalDistance} km · ${totalDuration} min</strong>
+            ${modeLabel} directions
+          </div>
         </div>
-      `
-          : ""
-      }
-      <div class="directions-header">
-
-        <span class="summary-icon">${modeIcon}</span>
-        <div class="summary-text">
-          <strong>${totalDistance} km · ${totalDuration} min</strong>
-          ${modeLabel} directions
-        </div>
-      </div>
-      <div class="directions-steps">${stepsHtml}</div>
-    `;
+        <div class="directions-steps">${stepsHtml}</div>
+      `;
+    }
   } catch (err) {
     console.error("Routing error:", err);
     alert("Failed to load route.");
@@ -324,19 +432,50 @@ function getMarkerColor(level) {
   return "gray";
 }
 
+function formatCreatedAt(createdAt) {
+  if (!createdAt) return "Unknown date";
+
+  let jsDate = null;
+
+  if (typeof createdAt.toDate === "function") {
+    jsDate = createdAt.toDate();
+  } else if (createdAt instanceof Date) {
+    jsDate = createdAt;
+  }
+
+  if (!jsDate) return "Unknown date";
+
+  return jsDate.toLocaleString("en-CA", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
 function buildPopupHtml(data) {
   const imageHtml = data.image
-    ? `<img src="data:image/jpeg;base64,${data.image}" alt="Report image" style="width:100%;max-width:180px;border-radius:8px;margin-top:8px;" />`
+    ? `<img src="data:image/jpeg;base64,${data.image}" alt="Report image" style="width:100%;max-width:220px;border-radius:8px;margin-bottom:10px;" />`
     : "";
 
   return `
-    <div style="min-width:180px;">
-      <strong>${data.name || "Anonymous"}</strong><br>
-      Crowd level: ${data.crowdLevel || "N/A"}<br>
-      ${data.location || ""}<br>
+    <div style="min-width:220px;max-width:240px;">
       ${imageHtml}
+      <div style="font-weight:bold;margin-bottom:6px;">${data.location || "Unknown location"}</div>
+      <div style="margin-bottom:4px;"><strong>Crowd level:</strong> ${data.crowdLevel || "N/A"}</div>
+      <div style="margin-bottom:4px;"><strong>Created:</strong> ${formatCreatedAt(data.createdAt)}</div>
+      <div><strong>Submitted by:</strong> ${data.name || "Anonymous"}</div>
     </div>
   `;
+}
+
+function closeCurrentPopup() {
+  if (currentPopup) {
+    currentPopup.remove();
+    currentPopup = null;
+  }
 }
 
 async function addReportMarkers() {
@@ -344,27 +483,58 @@ async function addReportMarkers() {
     const q = query(collection(db, "reports"), orderBy("createdAt", "desc"));
     const snapshot = await getDocs(q);
 
+    reportPoints = [];
+    reportMarkers.forEach((marker) => marker.remove());
+    reportMarkers = [];
+
+    const latestByLocation = new Map();
+
     snapshot.forEach((doc) => {
       const data = doc.data();
       if (typeof data.lat !== "number" || typeof data.lng !== "number") return;
 
-      // Save for later crowd detection
       reportPoints.push({
         lat: data.lat,
         lng: data.lng,
         crowdLevel: data.crowdLevel,
       });
 
+      const key = (data.location || data.address || "unknown")
+        .trim()
+        .toLowerCase();
+
+      if (!latestByLocation.has(key)) {
+        latestByLocation.set(key, data);
+      }
+    });
+
+    latestByLocation.forEach((data) => {
+      const coords = [data.lng, data.lat];
+
       const popup = new maplibregl.Popup({
         closeButton: true,
-        closeOnClick: true,
+        closeOnClick: false,
         offset: 18,
       }).setHTML(buildPopupHtml(data));
 
-      new maplibregl.Marker({ color: getMarkerColor(data.crowdLevel) })
-        .setLngLat([data.lng, data.lat])
+      popup.on("open", () => {
+        currentPopup = popup;
+      });
+
+      popup.on("close", () => {
+        if (currentPopup === popup) {
+          currentPopup = null;
+        }
+      });
+
+      const marker = new maplibregl.Marker({
+        color: getMarkerColor(data.crowdLevel),
+      })
+        .setLngLat(coords)
         .setPopup(popup)
         .addTo(map);
+
+      reportMarkers.push(marker);
     });
   } catch (error) {
     console.error("Error loading report markers:", error);
