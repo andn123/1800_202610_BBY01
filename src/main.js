@@ -120,6 +120,7 @@ function setupForm() {
 
       alert("Report submitted!");
       form.reset();
+      window.location.href = "/pages/reports.html";
       selectedLocation = null; // reset selection after submit
     } catch (error) {
       console.error(error);
