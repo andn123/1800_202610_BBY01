@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Arrivals - IntelliRoute</title>
+    <title>Arrivals</title>
+    <link href="/images/ir-logo.png" rel="icon" type="image/x-icon" />
     <meta name="comp1800 template" content="My 1800 App" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -49,11 +50,11 @@
   <body>
     <site-navbar></site-navbar>
 
-    <main class="container py-5" style="max-width: 700px;">
+    <main class="container py-5" style="max-width: 700px">
       <h1 class="mb-2">Transit Arrivals</h1>
       <p class="text-muted mb-4">
-        Enter your <strong>Bus Stop ID</strong> — the 5-digit number on the bus stop sign —
-        to see upcoming real-time arrivals.
+        Enter your <strong>Bus Stop ID</strong> — the 5-digit number on the bus
+        stop sign — to see upcoming real-time arrivals.
       </p>
 
       <!-- Stop ID search -->
@@ -70,7 +71,7 @@
         />
         <button class="btn btn-primary btn-lg" id="lookupBtn">Look Up</button>
       </div>
-      <p class="text-muted" style="font-size: 0.85rem;">
+      <p class="text-muted" style="font-size: 0.85rem">
         Find your stop ID on the physical bus sign or on Google Maps.
       </p>
 
@@ -84,7 +85,13 @@
         <!-- Stop name + external link -->
         <div class="d-flex justify-content-between align-items-center mb-1">
           <div id="stopName" class="stop-heading"></div>
-          <a id="externalLink" href="#" target="_blank" rel="noopener noreferrer" class="external-link text-muted">
+          <a
+            id="externalLink"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="external-link text-muted"
+          >
             Open on TransitDB ↗
           </a>
         </div>
@@ -92,7 +99,9 @@
         <!-- Loading spinner -->
         <div id="loadingSpinner" class="text-center py-4">
           <div class="spinner-border text-primary" role="status"></div>
-          <p class="text-muted mt-2 mb-0" style="font-size:0.9rem;">Fetching arrivals…</p>
+          <p class="text-muted mt-2 mb-0" style="font-size: 0.9rem">
+            Fetching arrivals…
+          </p>
         </div>
 
         <!-- Arrivals table -->
@@ -111,7 +120,12 @@
         <!-- Fetch fallback -->
         <div id="fallbackMsg" class="alert alert-warning d-none mt-3">
           Could not load arrivals automatically.
-          <a id="fallbackLink" href="#" target="_blank" rel="noopener noreferrer">
+          <a
+            id="fallbackLink"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Click here to view them on TransitDB ↗
           </a>
         </div>
@@ -205,7 +219,10 @@
             fallbackMsg.classList.remove("d-none");
           } else {
             arrivalsBody.innerHTML = rows
-              .map(r => `<tr><td><strong>${r.time}</strong></td><td>${r.headsign}</td></tr>`)
+              .map(
+                (r) =>
+                  `<tr><td><strong>${r.time}</strong></td><td>${r.headsign}</td></tr>`,
+              )
               .join("");
             tableWrapper.classList.remove("d-none");
           }
@@ -217,15 +234,21 @@
         }
       }
 
-      document.getElementById("lookupBtn").addEventListener("click", handleLookup);
+      document
+        .getElementById("lookupBtn")
+        .addEventListener("click", handleLookup);
 
-      document.getElementById("stopInput").addEventListener("keydown", function (e) {
-        if (e.key === "Enter") handleLookup();
-      });
+      document
+        .getElementById("stopInput")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter") handleLookup();
+        });
 
-      document.getElementById("stopInput").addEventListener("input", function () {
-        document.getElementById("errorMsg").classList.add("d-none");
-      });
+      document
+        .getElementById("stopInput")
+        .addEventListener("input", function () {
+          document.getElementById("errorMsg").classList.add("d-none");
+        });
     </script>
   </body>
 </html>

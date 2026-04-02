@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>My BCIT Project</title>
+    <title>Crowd Reports</title>
+    <link href="/images/ir-logo.png" rel="icon" type="image/x-icon" />
     <meta name="comp1800 template" content="My 1800 App" />
 
     <!-- Required meta tags -->
@@ -19,12 +20,16 @@
       <h1>Crowd-Level Reports</h1>
 
       <!-- Loading message -->
-      <div id="loadingMessage" class="alert alert-info" style="display: none;">
+      <div id="loadingMessage" class="alert alert-info" style="display: none">
         Loading reports...
       </div>
 
       <!-- Error message -->
-      <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+      <div
+        id="errorMessage"
+        class="alert alert-danger"
+        style="display: none"
+      ></div>
 
       <!-- SEARCH + SORT -->
       <div class="row g-2 mb-3 mt-3">
@@ -45,7 +50,11 @@
       </div>
 
       <!-- No results message -->
-      <div id="noResultsMessage" class="alert alert-warning" style="display: none;">
+      <div
+        id="noResultsMessage"
+        class="alert alert-warning"
+        style="display: none"
+      >
         No reports found.
       </div>
 
@@ -53,10 +62,7 @@
       <p id="pageInfo" class="text-muted small mb-2"></p>
 
       <!-- Reports grid -->
-      <div
-        id="crowd-reports"
-        class="row row-cols-1 row-cols-md-3 g-4"
-      ></div>
+      <div id="crowd-reports" class="row row-cols-1 row-cols-md-3 g-4"></div>
 
       <!-- Pagination -->
       <div id="paginationContainer" class="mt-4"></div>
