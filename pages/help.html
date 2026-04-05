@@ -1,182 +1,184 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <title>Help</title>
-    <link href="/images/ir-logo.png" rel="icon" type="image/x-icon" />
-    <meta name="comp1800 template" content="My 1800 App" />
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="/styles/help.css" />
 
-    <script type="module" src="/src/components/site-navbar.js"></script>
-    <script type="module" src="/src/components/site-footer.js"></script>
-  </head>
+<head>
+  <title>Help</title>
+  <link href="/images/ir-logo.png" rel="icon" type="image/x-icon" />
+  <meta name="comp1800 template" content="My 1800 App" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <body>
-    <site-navbar></site-navbar>
+  <link rel="stylesheet" href="/styles/help.css" />
 
-    <!-- Main content -->
-    <main class="help-page">
-      <section class="help-hero">
-        <div class="help-hero-inner">
-          <h1>Help Center</h1>
-          <p>
-            Step-by-step instructions for how to use our app, depending on what
-            you are looking for and use the methods accordingly.
-          </p>
+  <script type="module" src="/src/components/site-navbar.js"></script>
+  <script type="module" src="/src/components/site-footer.js"></script>
+</head>
+
+<body>
+  <site-navbar></site-navbar>
+
+  <!-- Main content -->
+  <main class="help-page">
+    <section class="help-hero">
+      <div class="help-hero-inner">
+        <h1>Help Center</h1>
+        <p>
+          Step-by-step instructions for how to use our app depending on what
+          you are looking for.
+        </p>
+      </div>
+    </section>
+
+    <section class="help-wrapper">
+      <!-- Search places -->
+      <article class="guide-card">
+        <div class="guide-head">
+          <h2>Search places and get directions</h2>
+          <span class="guide-tag">Search</span>
         </div>
-      </section>
 
-      <section class="help-wrapper">
-        <!-- Method #1 -->
-        <article class="guide-card">
-          <div class="guide-head">
-            <h2>Method #1: Search a destination</h2>
-            <span class="guide-tag">Search</span>
-          </div>
-
-          <div class="steps">
-            <div class="step">
-              <div class="step-num">1</div>
-              <div class="step-body">
-                <h3>Open the app</h3>
-                <p>Go to the Search page from the navbar.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">2</div>
-              <div class="step-body">
-                <h3>Enter destination</h3>
-                <p>Type into the destination search box.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">3</div>
-              <div class="step-body">
-                <h3>Choose a suggestion</h3>
-                <p>Select a recommended destination from the dropdown.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">4</div>
-              <div class="step-body">
-                <h3>View results</h3>
-                <p>Your selected destination will be shown/used in the page.</p>
-              </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3>Open the app</h3>
+              <p>Go to the Search page from the navbar.</p>
             </div>
           </div>
-        </article>
 
-        <!-- Method #2 (World Cup events) -->
-        <article class="guide-card">
-          <div class="guide-head">
-            <h2>Method #2: Navigate to World Cup specific events</h2>
-            <span class="guide-tag">Events</span>
-          </div>
+          <div class="arrow">→</div>
 
-          <div class="steps">
-            <div class="step">
-              <div class="step-num">1</div>
-              <div class="step-body">
-                <h3>Open the app</h3>
-                <p>Start from the Home screen.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">2</div>
-              <div class="step-body">
-                <h3>Open Events (FIFA)</h3>
-                <p>Browse the list of World Cup specific events.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">3</div>
-              <div class="step-body">
-                <h3>Select an event</h3>
-                <p>Tap an event to see its details and directions option.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">4</div>
-              <div class="step-body">
-                <h3>View directions</h3>
-                <p>Get directions/route information for the chosen event.</p>
-              </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3>Enter a destination</h3>
+              <p>Type the place you want to search for in the search bar.</p>
             </div>
           </div>
-        </article>
 
-        <!-- Method #3 (Transit arrivals) -->
-        <article class="guide-card">
-          <div class="guide-head">
-            <h2>Method #3: View upcoming transit arrival times</h2>
-            <span class="guide-tag">Transit</span>
-          </div>
+          <div class="arrow">→</div>
 
-          <div class="steps">
-            <div class="step">
-              <div class="step-num">1</div>
-              <div class="step-body">
-                <h3>Open Transit</h3>
-                <p>Go to the Transit page from the navbar.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">2</div>
-              <div class="step-body">
-                <h3>Select a stop</h3>
-                <p>Choose your nearest station/stop.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">3</div>
-              <div class="step-body">
-                <h3>Pick a route</h3>
-                <p>Choose the route you want to track.</p>
-              </div>
-            </div>
-
-            <div class="arrow">→</div>
-
-            <div class="step">
-              <div class="step-num">4</div>
-              <div class="step-body">
-                <h3>See arrival times</h3>
-                <p>View the upcoming arrival times for that route.</p>
-              </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3>Choose a suggestion</h3>
+              <p>Select a recommended place from the dropdown list and the travel mode.</p>
             </div>
           </div>
-        </article>
-      </section>
-    </main>
 
-    <site-footer></site-footer>
+          <div class="arrow">→</div>
 
-    <!-- App script -->
-    <script type="module" src="/src/app.js"></script>
-  </body>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h3>View the result</h3>
+              <p>The selected destination will be shown on the map and can be used for directions.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post crowd report -->
+      <article class="guide-card">
+        <div class="guide-head">
+          <h2>Post a crowd report</h2>
+          <span class="guide-tag">Crowd Report</span>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3>Open the app</h3>
+              <p>Start from the Home page or Search page.</p>
+            </div>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3>Go to the report page</h3>
+              <p>At the bottom of the page in search page, you will be able to see the options to view or post crowd-level information.</p>
+            </div>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3>Fill in the report details</h3>
+              <p>Enter the location, choose the crowd level, and add any other required information.</p>
+            </div>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h3>Submit your report</h3>
+              <p>Press the submit button so your crowd report appears in the app.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Arrivals -->
+      <article class="guide-card">
+        <div class="guide-head">
+          <h2>View upcoming transit arrival times</h2>
+          <span class="guide-tag">Arrivals</span>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3>Open Arrivals</h3>
+              <p>Go to the Arrivals page from the navbar.</p>
+            </div>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3>Select a stop</h3>
+              <p>Choose your nearest station or stop.</p>
+            </div>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3>Pick a route</h3>
+              <p>Choose the route you want to track.</p>
+            </div>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h3>See arrival times</h3>
+              <p>View the upcoming arrival times for that route.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <site-footer></site-footer>
+
+  <!-- App script -->
+  <script type="module" src="/src/app.js"></script>
+</body>
 </html>

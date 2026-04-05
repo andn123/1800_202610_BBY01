@@ -1,8 +1,15 @@
 import maplibregl from "maplibre-gl";
 import MaplibreGeocoder from "@maplibre/maplibre-gl-geocoder";
 import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css";
-import { db } from "./firebaseConfig.js";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { db, auth } from "./firebaseConfig.js";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 // Global map instance
 let map = null;
@@ -245,10 +252,32 @@ function addSearchControl() {
   searchContainer.innerHTML = "";
   searchContainer.appendChild(geocoder.onAdd(map));
 
-  geocoder.on("result", (e) => {
+  geocoder.on("result", async (e) => {
     const [lng, lat] = e.result.center;
+    const placeName = e.result.place_name || e.result.text || "Unknown location";
+
+    await saveSearchToRoutes(placeName);
     routeToPoint(lng, lat);
   });
+}
+
+async function saveSearchToRoutes(placeName) {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await addDoc(collection(db, "routes"), {
+      userId: user.uid,
+      destination: placeName,
+      route: placeName,
+      name: user.displayName || user.email || "Anonymous",
+      createdAt: serverTimestamp(),
+    });
+
+    console.log("Search saved to routes collection");
+  } catch (error) {
+    console.error("Error saving search to routes:", error);
+  }
 }
 
 // Step icon helper
