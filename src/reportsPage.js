@@ -1,4 +1,4 @@
-// added sorting, search, and pagination to reports page
+// 
 import { db } from "./firebaseConfig.js";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { onAuthReady } from "./authentication.js";

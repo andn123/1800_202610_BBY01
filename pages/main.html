@@ -6,42 +6,128 @@
     <meta name="comp1800 template" content="My 1800 App" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <link rel="stylesheet" href="../styles/style.css" />
-
     <script type="module" src="/src/components/site-navbar.js"></script>
     <script type="module" src="/src/components/site-footer.js"></script>
+    <style>
+      .welcome-section {
+        padding: 2.5rem 1.5rem 2rem;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .welcome-section h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: rgb(18, 3, 46);
+        margin-bottom: 0.4rem;
+      }
+      .welcome-section p {
+        color: #6c757d;
+        margin-bottom: 1.25rem;
+        font-size: 0.97rem;
+      }
+      .welcome-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+      .welcome-actions .btn {
+        border-radius: 30px;
+        padding: 0.5rem 1.4rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .page-section {
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .page-section:last-of-type {
+        border-bottom: none;
+      }
+      .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: rgb(18, 3, 46);
+        margin-bottom: 1rem;
+      }
+      .searches-scroll-box {
+        max-height: 220px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        background: #fff;
+      }
+      .searches-scroll-box .list-group-item {
+        border-left: none;
+        border-right: none;
+        border-radius: 0;
+        font-size: 0.92rem;
+        color: rgb(18, 3, 46);
+      }
+      .searches-scroll-box .list-group-item:first-child {
+        border-top: none;
+        border-radius: 10px 10px 0 0;
+      }
+      .searches-scroll-box .list-group-item:last-child {
+        border-bottom: none;
+        border-radius: 0 0 10px 10px;
+      }
+      #my-crowd-reports .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        transition: transform 0.15s;
+      }
+      #my-crowd-reports .card:hover {
+        transform: translateY(-3px);
+      }
+      #myReportsPageInfo {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+      }
+    </style>
   </head>
-
   <body>
     <site-navbar></site-navbar>
 
-    <div class="container-fluid bg-light text-dark p-5">
-      <div class="container bg-light p-5">
-        <h1 class="display-4">
-          Good morning <span id="name-goes-here">friend</span>
-        </h1>
-        <hr />
-        <p>Select search to get directions to your destination.</p>
+    <!-- Welcome -->
+    <div class="welcome-section">
+      <div class="container">
+        <h1>Good morning, <span id="name-goes-here">friend</span> 👋</h1>
+        <p>Where would you like to go today?</p>
+        <div class="welcome-actions">
+          <a href="/pages/search.html" class="btn btn-primary"
+            >🔍 Search Destinations</a
+          >
+          <a href="/pages/post.html" class="btn btn-outline-secondary"
+            >📝 Post Crowd Report</a
+          >
+        </div>
       </div>
     </div>
 
-    <!-- NEW SECTION -->
-    <div class="container-fluid bg-light text-dark p-5">
-      <div class="container bg-light p-5">
-        <h1>Your Previous Searches</h1>
-        <div id="my-previous-searches" class="list-group"></div>
+    <!-- Previous Searches -->
+    <div class="page-section">
+      <div class="container">
+        <h2 class="section-title">Your Previous Searches</h2>
+        <div class="searches-scroll-box">
+          <div
+            id="my-previous-searches"
+            class="list-group list-group-flush"
+          ></div>
+        </div>
       </div>
     </div>
 
-    <div class="container-fluid bg-light text-dark p-5">
-      <div class="container bg-light p-5">
-        <h1>Your Crowd-Level Reports</h1>
-
+    <!-- Crowd Reports -->
+    <div class="page-section">
+      <div class="container">
+        <h2 class="section-title">Your Crowd-Level Reports</h2>
+        <p id="myReportsPageInfo"></p>
         <div
           id="my-crowd-reports"
           class="row row-cols-1 row-cols-md-3 g-4"
         ></div>
+        <div id="myReportsPaginationContainer" class="mt-4"></div>
       </div>
     </div>
 
@@ -53,10 +139,8 @@
             src=""
             alt="Report Image"
           />
-
           <div class="card-body d-flex flex-column">
             <h5 class="card-title"></h5>
-
             <p class="card-text">
               <span class="report-address"></span><br />
               <span class="report-crowd"></span><br />
@@ -69,10 +153,8 @@
     </template>
 
     <site-footer></site-footer>
-
     <script type="module" src="/src/app.js"></script>
     <script type="module" src="/src/main.js"></script>
     <script type="module" src="/src/myReportsPage.js"></script>
-    <script type="module" src="/src/previousSearches.js"></script>
   </body>
 </html>
