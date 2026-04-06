@@ -42,31 +42,70 @@ function setupLocationSearch() {
 
   if (!input || !dropdown) return;
 
+  let timeout;
+
   input.addEventListener("input", () => {
-    const query = input.value.toLowerCase();
-    dropdown.innerHTML = "";
-    selectedLocation = null;
+    clearTimeout(timeout);
 
-    if (!query) return;
+    timeout = setTimeout(async () => {
+      const query = input.value.trim().toLowerCase();
+      dropdown.innerHTML = "";
+      selectedLocation = null;
 
-    const filtered = locations.filter((loc) =>
-      loc.name.toLowerCase().includes(query),
-    );
+      if (!query) return;
 
-    filtered.forEach((loc) => {
-      const item = document.createElement("button");
-      item.type = "button";
-      item.className = "list-group-item list-group-item-action";
-      item.textContent = loc.name;
+      // Show local results (Firestore)
+      const localMatches = locations.filter((loc) =>
+        loc.name.toLowerCase().includes(query),
+      );
 
-      item.addEventListener("click", () => {
-        input.value = loc.name;
-        selectedLocation = loc;
-        dropdown.innerHTML = "";
+      // Show local results first
+      localMatches.slice(0, 5).forEach((loc) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "list-group-item list-group-item-action";
+        item.textContent = loc.name;
+
+        item.addEventListener("click", () => {
+          input.value = loc.name;
+          selectedLocation = loc;
+          dropdown.innerHTML = "";
+        });
+
+        dropdown.appendChild(item);
       });
 
-      dropdown.appendChild(item);
-    });
+      // Show API results (OpenStreetMap)
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        data.slice(0, 5).forEach((place) => {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.className = "list-group-item list-group-item-action";
+          item.textContent = place.display_name;
+
+          item.addEventListener("click", () => {
+            input.value = place.display_name;
+
+            selectedLocation = {
+              name: place.display_name,
+              lat: parseFloat(place.lat),
+              lng: parseFloat(place.lon),
+              id: null,
+            };
+
+            dropdown.innerHTML = "";
+          });
+
+          dropdown.appendChild(item);
+        });
+      } catch (err) {
+        console.error("API error:", err);
+      }
+    }, 300);
   });
 
   // close dropdown when clicking outside
