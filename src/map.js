@@ -24,6 +24,19 @@ const appState = {
   markersVisible: true,
 };
 
+let locations = [];
+
+async function loadLocations() {
+  const snapshot = await getDocs(collection(db, "monitor_points"));
+
+  locations = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    name: doc.data().name,
+    lat: doc.data().lat,
+    lng: doc.data().lng,
+  }));
+}
+
 // Map init
 function showMap() {
   const mapContainer = document.getElementById("map");
@@ -43,6 +56,7 @@ function showMap() {
   map.once("load", async () => {
     addUserPin();
     await addReportMarkers();
+    await loadLocations();
     addSearchControl();
   });
 
@@ -216,27 +230,61 @@ function addSearchControl() {
   const geocoderApi = {
     forwardGeocode: async (config) => {
       const features = [];
-      const url =
-        `https://nominatim.openstreetmap.org/search` +
-        `?q=${encodeURIComponent(config.query)}` +
-        `&format=geojson&limit=5`;
+      const query = config.query.toLowerCase();
 
-      const response = await fetch(url);
-      const geojson = await response.json();
+      // Get Firestore matches first
+      const localMatches = locations.filter((loc) =>
+        loc.name.toLowerCase().includes(query),
+      );
 
-      for (const feature of geojson.features) {
-        const [minX, minY, maxX, maxY] = feature.bbox;
-        const center = [minX + (maxX - minX) / 2, minY + (maxY - minY) / 2];
+      localMatches.slice(0, 5).forEach((loc) => {
         features.push({
           type: "Feature",
-          geometry: { type: "Point", coordinates: center },
-          place_name: feature.properties.display_name,
-          text: feature.properties.display_name,
+          geometry: {
+            type: "Point",
+            coordinates: [loc.lng, loc.lat],
+          },
+          place_name: loc.name,
+          text: loc.name,
           place_type: ["place"],
-          properties: feature.properties,
-          center,
+          properties: {
+            source: "firestore",
+            id: loc.id,
+          },
+          center: [loc.lng, loc.lat],
         });
+      });
+
+      // Show OpenStreetMap results after
+      try {
+        const url =
+          `https://nominatim.openstreetmap.org/search` +
+          `?q=${encodeURIComponent(config.query)}` +
+          `&format=geojson&limit=5`;
+
+        const response = await fetch(url);
+        const geojson = await response.json();
+
+        for (const feature of geojson.features) {
+          const [minX, minY, maxX, maxY] = feature.bbox;
+          const center = [minX + (maxX - minX) / 2, minY + (maxY - minY) / 2];
+
+          features.push({
+            type: "Feature",
+            geometry: { type: "Point", coordinates: center },
+            place_name: feature.properties.display_name,
+            text: feature.properties.display_name,
+            place_type: ["place"],
+            properties: {
+              source: "osm",
+            },
+            center,
+          });
+        }
+      } catch (err) {
+        console.error("Nominatim error:", err);
       }
+
       return { features };
     },
   };
@@ -254,7 +302,8 @@ function addSearchControl() {
 
   geocoder.on("result", async (e) => {
     const [lng, lat] = e.result.center;
-    const placeName = e.result.place_name || e.result.text || "Unknown location";
+    const placeName =
+      e.result.place_name || e.result.text || "Unknown location";
 
     await saveSearchToRoutes(placeName);
     routeToPoint(lng, lat);
