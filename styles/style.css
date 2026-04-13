@@ -109,7 +109,7 @@ header {
   padding: 20px;
   background:
     linear-gradient(rgba(49, 173, 255, 0.75), rgba(240, 241, 241, 0.75)),
-    url("../images/banner.png") no-repeat center center;
+    url("/images/banner.png") no-repeat center center;
   background-size: cover;
 }
 
