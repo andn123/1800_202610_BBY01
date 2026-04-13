@@ -71,10 +71,11 @@ To run the application locally:
 │   └── map.html
 │   └── post.html
 │   └── reports.html
-├── images/
-│   └── banner.png
-│   └── info-background.jpg
-│   └── ir-logo.png
+├── public/
+│   └── images/
+│       └── banner.png
+│       └── info-background.jpg
+│       └── ir-logo.png
 ├── videos/
 │   └── pitch.mp4
 ├── .gitignore
