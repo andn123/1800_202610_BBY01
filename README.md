@@ -44,14 +44,46 @@ To run the application locally:
 ```
 1800_202610_BBY01/
 ├── src/
+│   ├── app.js
+│   ├── authentication.js
+│   ├── firebaseConfig.js
+│   ├── loginSignup.js
 │   ├── main.js
+│   ├── map.js
+│   ├── myReportsPage.js
+│   ├── previousSearches.js
+│   ├── reports.js
+│   ├── reportsPage.js
+│   ├── components/
+│       └── site-footer.js
+│       └── site-navbar.js
 ├── styles/
+│   └── about.css
+│   └── help.css
+│   └── map.css
 │   └── style.css
-├── public/
+├── pages/
+│   └── about.html
+│   └── arrival.html
+│   └── help.html
+│   └── login.html
+│   └── main.html
+│   └── map.html
+│   └── post.html
+│   └── reports.html
 ├── images/
-├── index.html
-├── package.json
+│   └── banner.png
+│   └── info-background.jpg
+│   └── ir-logo.png
+├── videos/
+│   └── pitch.mp4
+├── .gitignore
 ├── README.md
+├── index.html
+├── monitor_points.csv
+├── package-lock.json
+├── package.json
+
 ```
 
 ---
